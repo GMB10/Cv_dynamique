@@ -1,0 +1,133 @@
+/* --- Base générale --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 0;
+}
+
+/* Carte verre */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Texte gradient */
+.gradient-text {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Boutons ou backgrounds en gradient */
+.gradient-bg {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.gradient-bg:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* --- Conteneur du CV --- */
+#cv-preview-container {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    --color-header: #4f46e5;
+    --color-title: #4f46e5;
+    --color-text: #1e293b;
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* --- MODERNE : sidebar gauche --- */
+#cv-preview-container.template-modern {
+    flex-direction: row;
+}
+#cv-preview-container.template-modern #cv-left {
+    flex: 1;
+    padding: 1.5rem;
+    background: var(--color-header);
+    color: white;
+}
+#cv-preview-container.template-modern #cv-right {
+    flex: 2;
+    padding: 1.5rem;
+    background: white;
+}
+
+/* --- MINIMALISTE : colonne unique --- */
+#cv-preview-container.template-minimal {
+    flex-direction: column;
+    background: white;
+}
+#cv-preview-container.template-minimal #cv-left,
+#cv-preview-container.template-minimal #cv-right {
+    flex: unset;
+    padding: 1rem;
+}
+
+/* --- CREATIF : bandeau coloré en header --- */
+#cv-preview-container.template-creative {
+    flex-direction: column;
+}
+#cv-preview-container.template-creative #cv-header {
+    background: var(--color-header);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* --- Sections du CV --- */
+#cv-preview-container h2,
+#cv-preview-container h3 {
+    color: var(--color-title);
+}
+
+#cv-preview-container p,
+#cv-preview-container li,
+#cv-preview-container span {
+    color: var(--color-text);
+}
+
+/* --- Liste compétences, langues, intérêts --- */
+#preview-skills li,
+#preview-langs li,
+#preview-interests li {
+    display: inline-block;
+    margin: 0.25rem 0.25rem 0 0;
+}
+
+/* --- Bouton Save CV --- */
+#save-cv-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 0;
+    font-size: 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    #cv-preview-container.template-modern {
+        flex-direction: column;
+    }
+}
