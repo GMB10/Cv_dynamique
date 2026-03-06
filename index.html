@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV Generator Pro - Créez votre avenir</title>
+
+<!-- Tailwind + Google Fonts -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+
+<!-- NAVIGATION -->
+<nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2 font-bold text-2xl tracking-tight">
+            <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center text-white">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <span>CV<span class="text-indigo-600">Gen</span><span class="text-slate-400">Pro</span></span>
+        </div>
+        <div id="user-nav" class="hidden flex items-center gap-4">
+            <span id="display-user" class="text-sm font-medium text-slate-600"></span>
+            <button onclick="logout()" class="text-sm text-red-500 hover:underline">Déconnexion</button>
+        </div>
+    </div>
+</nav>
+
+<!-- SECTION 1: AUTHENTIFICATION -->
+<section id="auth-section" class="min-h-screen pt-24 pb-12 px-6 flex items-center">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+
+        <!-- Texte & avantages -->
+        <div class="space-y-8">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold">
+                ✨ Gratuit et Sans Limite
+            </div>
+            <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight">
+                Créez votre CV <br>
+                <span class="gradient-text text-6xl">Professionnel</span>
+            </h1>
+            <p class="text-xl text-slate-600 max-w-lg">
+                Rejoignez des milliers de candidats qui ont décroché le job de leurs rêves grâce à nos modèles optimisés pour les recruteurs.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-6 rounded-2xl bg-amber-50 border border-amber-100 flex items-start gap-4 shadow-sm transition hover:shadow-md">
+                    <div class="p-3 bg-amber-500 rounded-xl text-white"><i data-lucide="zap"></i></div>
+                    <div>
+                        <h3 class="font-bold">Création Rapide</h3>
+                        <p class="text-sm text-slate-600">Moins de 5 minutes</p>
+                    </div>
+                </div>
+                <div class="p-6 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-4 shadow-sm transition hover:shadow-md">
+                    <div class="p-3 bg-rose-500 rounded-xl text-white"><i data-lucide="layers"></i></div>
+                    <div>
+                        <h3 class="font-bold">Templates Pros</h3>
+                        <p class="text-sm text-slate-600">Designs modernes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="relative">
+            <div class="absolute -top-10 -right-10 w-64 h-64 bg-indigo-300/20 blur-3xl rounded-full"></div>
+            <div class="glass-card p-8 rounded-3xl shadow-2xl relative z-10 border border-slate-100">
+                <h2 class="text-2xl font-bold mb-2">Bienvenue sur CVGenPro!</h2>
+                <p class="text-slate-500 mb-4">Connectez-vous pour commencer votre CV.</p>
+
+                <!-- Conteneur pour messages stylisés -->
+                <div id="login-message" class="mb-4 p-3 rounded-lg text-center hidden"></div>
+
+                <form id="loginForm" class="space-y-4">
+                    <input type="email" id="login-email" placeholder="exemple@mail.com" required class="cv-input w-full p-3 rounded-xl border border-slate-200 focus:ring-2 ring-indigo-500 outline-none">
+                    <input type="password" id="login-password" placeholder="••••••••" required class="cv-input w-full p-3 rounded-xl border border-slate-200 focus:ring-2 ring-indigo-500 outline-none">
+                    <button type="submit" class="w-full py-4 rounded-xl gradient-bg text-white font-bold shadow-lg hover:opacity-90 transition transform hover:-translate-y-1">Se connecter 🚀</button>
+                </form>
+                <p class="mt-6 text-center text-sm text-slate-500">
+                    Pas de compte ? <a href="inscription.html" class="text-indigo-800 font-semibold">Inscrivez-vous gratuitement</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- SECTION 2: SELECTION TEMPLATE -->
+<section id="template-section" class="hidden min-h-screen pt-32 pb-12 px-6 bg-slate-100">
+    <div class="max-w-6xl mx-auto text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4">Choisissez un modèle</h2>
+        <p class="text-slate-600">Tous nos modèles sont personnalisables et optimisés pour les systèmes ATS.</p>
+    </div>
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+        <!-- Templates comme avant -->
+        <div class="template-card group cursor-pointer" onclick="startEditor('modern')">
+            <div class="bg-white p-4 rounded-2xl shadow-xl transition group-hover:ring-4 ring-indigo-500 group-hover:-translate-y-2">
+                <div class="aspect-[3/4] bg-slate-200 rounded-lg overflow-hidden mb-4 relative">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-indigo-900/40 transition">
+                        <span class="px-6 py-2 bg-white rounded-full font-bold shadow-lg">Utiliser ce style</span>
+                    </div>
+                    <img src="img/photo_Cv_Moderne.png" alt="Template Moderne" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-xl">Le Moderne</h3>
+                <p class="text-sm text-slate-500">Élégant, avec colonne latérale sombre.</p>
+            </div>
+        </div>
+        <div class="template-card group cursor-pointer" onclick="startEditor('minimal')">
+            <div class="bg-white p-4 rounded-2xl shadow-xl transition group-hover:ring-4 ring-rose-500 group-hover:-translate-y-2">
+                <div class="aspect-[3/4] bg-slate-200 rounded-lg overflow-hidden mb-4 relative">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-rose-900/40 transition">
+                        <span class="px-6 py-2 bg-white rounded-full font-bold shadow-lg">Utiliser ce style</span>
+                    </div>
+                    <img src="img/photo_Cv_Minimaliste.png" alt="Template Minimaliste" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-xl">Le Minimaliste</h3>
+                <p class="text-sm text-slate-500">Focus sur le contenu, pur et académique.</p>
+            </div>
+        </div>
+        <div class="template-card group cursor-pointer" onclick="startEditor('creative')">
+            <div class="bg-white p-4 rounded-2xl shadow-xl transition group-hover:ring-4 ring-blue-500 group-hover:-translate-y-2">
+                <div class="aspect-[3/4] bg-slate-200 rounded-lg overflow-hidden mb-4 relative">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-blue-900/40 transition">
+                        <span class="px-6 py-2 bg-white rounded-full font-bold shadow-lg">Utiliser ce style</span>
+                    </div>
+                    <img src="img/photo_Cv_Executif.png" alt="Template Créatif" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-xl">L'Exécutif</h3>
+                <p class="text-sm text-slate-500">Dynamique avec des en-têtes colorés.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-white border-t border-slate-200 py-12">
+    <div class="max-w-7xl mx-auto px-6 text-center text-slate-500 text-sm">
+        <p>© 2024 CV Generator Pro. Conçu avec passion pour les futurs talents.</p>
+    </div>
+</footer>
+
+<!-- JS -->
+<script>
+lucide.createIcons();
+
+// Vérification numéro Sénégal
+function isValidSenegalPhone(phone){
+    return /^(?:\+221\s?|0)(7[0678]|76|77|78|70|75|79)\s?\d{2}\s?\d{2}\s?\d{2}$/.test(phone);
+}
+
+// Vérifie si l'utilisateur est déjà connecté
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if(user){
+    $('#auth-section').hide();
+    $('#template-section').show();
+    $('#user-nav').show();
+    $('#display-user').text(user.fullname);
+}
+
+// Déconnexion
+function logout(){
+    localStorage.removeItem('user');
+    window.location.reload();
+}
+
+// Connexion
+$('#loginForm').submit(async function(e){
+    e.preventDefault();
+    const email = $('#login-email').val();
+    const password = $('#login-password').val();
+    const messageDiv = $('#login-message');
+
+    // Validation mot de passe minimum
+    if(password.length < 6){
+        messageDiv.removeClass('hidden').addClass('bg-red-100 text-red-800').text('Le mot de passe doit contenir au moins 6 caractères.');
+        return;
+    }
+
+    // Validation email et téléphone (si champ téléphone ajouté)
+    // if($('#login-phone').length && !isValidSenegalPhone($('#login-phone').val())){
+    //     messageDiv.removeClass('hidden').addClass('bg-red-100 text-red-800').text('Numéro de téléphone invalide (Sénégal).');
+    //     return;
+    // }
+
+    try{
+        const res = await fetch('api/login.php',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({email,password})
+        });
+        const result = await res.json();
+
+        messageDiv.removeClass('hidden bg-green-100 text-green-800 bg-red-100 text-red-800');
+
+        if(result.success){
+            messageDiv.addClass('bg-green-100 text-green-800').text('Connexion réussie !').slideDown();
+            localStorage.setItem('user', JSON.stringify(result.user));
+            $('#auth-section').hide();
+            $('#template-section').show();
+            $('#user-nav').show();
+            $('#display-user').text(result.user.fullname);
+            setTimeout(() => { messageDiv.slideUp(); }, 3000);
+        } else {
+            messageDiv.addClass('bg-red-100 text-red-800').text(result.message).slideDown();
+        }
+    }catch(err){
+        messageDiv.removeClass('hidden bg-green-100 text-green-800 bg-red-100 text-red-800')
+                  .addClass('bg-red-100 text-red-800')
+                  .text('Erreur lors de la connexion, réessayez.').slideDown();
+        console.error(err);
+    }
+});
+
+// Sélection du template
+function startEditor(template){
+    localStorage.setItem('chosenTemplate', template);
+    window.location.href='editor.html';
+}
+</script>
+
+</body>
+</html>

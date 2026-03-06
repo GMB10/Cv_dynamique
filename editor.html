@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éditeur CV - CV Generator Pro</title>
+
+<!-- Tailwind + Google Fonts -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- html2pdf.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding-top: 80px;
+}
+
+/* Navbar */
+nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Carte verre */
+.glass-card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Boutons */
+.gradient-bg {
+    background: linear-gradient(135deg, #6b5bff 0%, #ff5b7d 100%);
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.gradient-bg:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+.add-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    background: linear-gradient(135deg,#6b5bff 0%,#ff5b7d 100%);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.add-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* CV container */
+#cv-preview-container {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    --color-header: #6b5bff;
+    --color-title: #6b5bff;
+    --color-text: #1e293b;
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Templates */
+
+/* ---------- Modern Template ---------- */
+.template-modern {
+    display: flex;
+    flex-direction: row;
+    background: #ffffff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.template-modern #cv-left {
+    flex: 1;
+    background: var(--color-header, #6b5bff);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    gap: 1rem;
+}
+
+.template-modern #cv-left h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 1rem;
+}
+
+.template-modern #cv-left h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: rgba(255,255,255,0.85);
+}
+
+/* Photo - Moderne Template */
+.template-modern #preview-photo {
+    width: 120px;            /* Taille plus grande que minimaliste */
+    height: 120px;
+    border-radius: 50%;      /* Cercle parfait */
+    overflow: hidden;
+    border: 3px solid white; /* Contraste avec le fond coloré */
+    margin: 0 auto 1rem auto; /* Centrée et espace avec le nom */
+    background: #f3f4f6;     /* Couleur de fond neutre */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.template-modern #preview-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       /* Remplit le cercle sans déformation */
+}
+
+.template-modern h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-header, #6b5bff);
+    padding-bottom: 0.25rem;
+}
+
+.template-modern p, 
+.template-modern li, 
+.template-modern span {
+    font-size: 0.95rem;
+    color: var(--color-text, #1e293b);
+    line-height: 1.5;
+}
+
+/* ---------- Minimal Template ---------- */
+/* Photo - Minimal Template */
+.template-minimal #preview-photo {
+    width: 100px;            /* Taille raisonnable */
+    height: 100px;
+    border-radius: 50%;      /* Cercle parfait */
+    overflow: hidden;
+    border: 2px solid var(--color-header, #6b5bff); /* bord discret */
+    margin-bottom: 1rem;
+    background: #f3f4f6;     /* Couleur neutre si pas de photo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.template-minimal #preview-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       /* Remplit le cercle sans déformation */
+}
+.template-minimal #cv-left,
+.template-minimal #cv-right {
+    flex: unset;
+    padding: 1rem;
+    text-align: left;
+}
+
+.template-minimal #cv-left h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-header, #6b5bff);
+}
+
+.template-minimal #cv-left h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+    color: var(--color-title, #6b5bff);
+}
+
+.template-minimal #cv-right h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--color-header, #6b5bff);
+    border-left: 3px solid var(--color-header, #6b5bff);
+    padding-left: 0.5rem;
+}
+
+.template-minimal p, 
+.template-minimal li, 
+.template-minimal span {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-text, #1e293b);
+}
+
+#preview-skills li,
+#preview-langs li,
+#preview-interests li {
+    display: inline-block;
+    margin: 0.25rem 0.25rem 0.25rem 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 0.25rem;
+    background: var(--color-header, #6b5bff);
+    color: white;
+}
+
+/* ---------- Responsive adjustments ---------- */
+@media (max-width: 768px) {
+    .template-modern {
+        flex-direction: column;
+    }
+    .template-modern #cv-left,
+    .template-modern #cv-right {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .template-modern #cv-left h2 {
+        font-size: 1.4rem;
+    }
+    .template-modern #cv-left h3 {
+        font-size: 1rem;
+    }
+
+    .template-minimal {
+        padding: 1.5rem;
+    }
+}
+
+/* Créatif amélioré */
+.template-creative {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.template-creative #cv-header {
+    background: linear-gradient(135deg,#6b5bff,#ff5b7d);
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    font-size: 2rem;
+    padding: 3rem 1rem 4rem 1rem;
+    position: relative;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+}
+
+.template-creative #preview-photo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 4px solid white;
+    position: absolute;
+    bottom: -65px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.template-creative #cv-right {
+    padding: 5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.template-creative .section-card {
+    background: #f9fafb;
+    border-left: 5px solid var(--color-header);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.template-creative .section-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.template-creative h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.25rem;
+}
+.template-creative h3 {
+    font-size: 1.3rem;
+    font-weight: 500;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+/* Badges compétences/langues/intérêts */
+.template-creative ul li {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg,#ff5b7d,#6b5bff);
+    transition: transform 0.2s ease;
+}
+.template-creative ul li:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width:768px){
+    .template-modern{flex-direction:column;}
+    .template-creative #preview-photo{width:100px;height:100px;bottom:-50px;}
+    .template-creative #cv-right{padding:3rem 1rem 1rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+    <div class="flex items-center gap-2 font-bold text-2xl tracking-tight">
+        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center text-white">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+        </div>
+        <span>CV<span class="text-indigo-600">Gen</span><span class="text-slate-400">Pro</span></span>
+    </div>
+    <div class="flex items-center gap-4">
+        <span id="user-name" class="font-semibold text-gray-700"></span>
+        <button onclick="logout()" class="text-sm text-red-500 hover:underline">Déconnexion</button>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-8">
+
+<!-- Formulaire -->
+<div class="space-y-6 col-span-1">
+    <h2 class="text-2xl font-bold">Informations personnelles</h2>
+    <input type="text" id="in-name" placeholder="Nom complet *" class="cv-input required">
+    <input type="text" id="in-title" placeholder="Poste visé *" class="cv-input required">
+    <textarea id="in-bio" placeholder="À propos de vous..." class="cv-textarea"></textarea>
+    <input type="email" id="in-email" placeholder="Email *" class="cv-input required">
+    <input type="text" id="in-phone" placeholder="Téléphone *" class="cv-input required">
+    <input type="text" id="in-location" placeholder="Ville, Pays" class="cv-input">
+    <input type="text" id="in-linkedin" placeholder="LinkedIn" class="cv-input">
+
+    <h3 class="section-title mt-4">Photo de profil</h3>
+    <input type="file" id="in-photo" accept="image/*" class="cv-input">
+
+    <h3 class="section-title mt-4">Personnaliser les couleurs</h3>
+    <label>En-tête: <input type="color" id="color-header" value="#6b5bff"></label><br>
+    <label>Titre: <input type="color" id="color-title" value="#6b5bff"></label><br>
+    <label>Texte: <input type="color" id="color-text" value="#1e293b"></label>
+
+    <h3 class="section-title mt-4">Template</h3>
+    <select id="template-select" class="cv-input">
+        <option value="modern">Moderne</option>
+        <option value="minimal">Minimal</option>
+        <option value="creative">Créatif</option>
+    </select>
+
+    <h3 class="section-title mt-4">Expériences professionnelles</h3>
+    <div id="experience-list"></div>
+    <span id="add-exp" class="add-btn mt-1">+ Ajouter expérience</span>
+
+    <h3 class="section-title mt-4">Compétences</h3>
+    <div id="skill-list"></div>
+    <span id="add-skill" class="add-btn mt-1">+ Ajouter compétence</span>
+
+    <h3 class="section-title mt-4">Langues</h3>
+    <div id="lang-list"></div>
+    <span id="add-lang" class="add-btn mt-1">+ Ajouter langue</span>
+
+    <h3 class="section-title mt-4">Centres d'intérêt</h3>
+    <div id="interest-list"></div>
+    <span id="add-interest" class="add-btn mt-1">+ Ajouter centre d'intérêt</span>
+
+    <button id="save-cv-btn" class="gradient-bg py-3 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition mt-4">
+        💾 Enregistrer le CV
+    </button>
+
+    <h3 class="section-title mt-6">CV sauvegardés</h3>
+    <div id="saved-cv-list"></div>
+</div>
+
+<!-- CV Preview -->
+<div class="lg:col-span-2 flex flex-col gap-4">
+    <div id="cv-preview-container" class="rounded-xl shadow-lg overflow-hidden template-creative">
+        <div id="cv-header">
+            <div id="preview-name">Nom Complet</div>
+            <div id="preview-title">Poste Visé</div>
+            <div id="preview-photo">
+                <span class="text-slate-400">Photo</span>
+            </div>
+        </div>
+        <div id="cv-right">
+            <div class="section-card" id="preview-bio">À propos de vous...</div>
+            <div class="section-card">
+                <h4>Contact</h4>
+                <p>Email: <span id="preview-email">exemple@mail.com</span></p>
+                <p>Téléphone: <span id="preview-phone">+221 77 123 45 67</span></p>
+                <p>Localisation: <span id="preview-location">Ville, Pays</span></p>
+                <p>LinkedIn: <span id="preview-linkedin">linkedin.com/in/exemple</span></p>
+            </div>
+            <div class="section-card">
+                <h4>Expériences</h4>
+                <div id="preview-experience"></div>
+            </div>
+            <div class="section-card">
+                <h4>Compétences</h4>
+                <ul id="preview-skills" class="flex flex-wrap gap-2"></ul>
+            </div>
+            <div class="section-card">
+                <h4>Langues</h4>
+                <ul id="preview-langs" class="flex flex-wrap gap-2"></ul>
+            </div>
+            <div class="section-card">
+                <h4>Centres d'intérêt</h4>
+                <ul id="preview-interests" class="flex flex-wrap gap-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <button id="export-btn" class="gradient-bg py-3 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition mt-2">
+        📄 Exporter le CV en PDF
+    </button>
+</div>
+</div>
+
+<script>
+lucide.createIcons();
+let photoData = null;
+
+// User session
+const user = JSON.parse(localStorage.getItem('user'));
+if(user && user.fullname){ $('#user-name').text(user.fullname); }
+else { location.href='index.html'; }
+
+function logout(){ localStorage.removeItem('user'); location.href='index.html'; }
+
+// Photo upload
+$('#in-photo').on('change', function(e){
+    const file = e.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(ev){ 
+            photoData = ev.target.result;
+            $('#preview-photo').html(`<img src="${photoData}" class="w-full h-full object-cover rounded-full">`); 
+        }
+        reader.readAsDataURL(file);
+    } else {
+        photoData=null; 
+        $('#preview-photo').html(`<span class="text-slate-400">Photo</span>`);
+    }
+});
+
+// Add dynamic fields
+$('#add-exp').click(()=>$('#experience-list').append(`<div class="mb-2">
+    <input type="text" placeholder="Entreprise" class="cv-input in-exp-company">
+    <input type="text" placeholder="Période" class="cv-input in-exp-date">
+    <textarea placeholder="Description" class="cv-textarea in-exp-desc"></textarea>
+    <span class="remove-btn add-btn mt-1">Supprimer</span>
+</div>`));
+$('#add-skill').click(()=>$('#skill-list').append(`<input type="text" placeholder="Compétence" class="cv-input in-skill">`));
+$('#add-lang').click(()=>$('#lang-list').append(`<input type="text" placeholder="Langue" class="cv-input in-lang">`));
+$('#add-interest').click(()=>$('#interest-list').append(`<input type="text" placeholder="Ex: Football, Lecture..." class="cv-input in-interest">`));
+$(document).on('click','.remove-btn', function(){ $(this).parent().remove(); updatePreviewEditor(); });
+
+// Update preview
+function updatePreviewEditor(){
+    $('#preview-name').text($('#in-name').val()||'Nom Complet');
+    $('#preview-title').text($('#in-title').val()||'Poste Visé');
+    $('#preview-bio').text($('#in-bio').val()||'À propos de vous...');
+    $('#preview-email').text($('#in-email').val()||'exemple@mail.com');
+    $('#preview-phone').text($('#in-phone').val()||'+221 77 123 45 67');
+    $('#preview-location').text($('#in-location').val()||'Ville, Pays');
+    $('#preview-linkedin').text($('#in-linkedin').val()||'linkedin.com/in/exemple');
+
+    const headerColor = $('#color-header').val()||'#6b5bff';
+    const titleColor = $('#color-title').val()||'#6b5bff';
+    const textColor = $('#color-text').val()||'#1e293b';
+    $('#cv-preview-container').css('--color-header', headerColor).css('--color-title', titleColor).css('--color-text', textColor);
+
+    let expHTML=''; 
+    $('#experience-list > div').each(function(){
+        const company=$(this).find('.in-exp-company').val();
+        const date=$(this).find('.in-exp-date').val();
+        const desc=$(this).find('.in-exp-desc').val();
+        if(company||date||desc) expHTML+=`<p><b>${company}</b> (${date}): ${desc}</p>`;
+    });
+    $('#preview-experience').html(expHTML||'<p>Aucune expérience ajoutée</p>');
+
+    const skills = $('#skill-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
+    $('#preview-skills').html(skills.map(s=>`<li>${s}</li>`).join(''));
+    const langs = $('#lang-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
+    $('#preview-langs').html(langs.map(l=>`<li>${l}</li>`).join(''));
+    const interests = $('#interest-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
+    $('#preview-interests').html(interests.map(i=>`<li>${i}</li>`).join(''));
+}
+
+// Save CV
+function saveCV(){
+    if(!user){ Swal.fire('⚠️ Connectez-vous pour sauvegarder le CV'); return; }
+    let errorFields = [];
+    $('.required').each(function(){
+        if(!$(this).val().trim()){ errorFields.push($(this).attr('placeholder')); }
+    });
+    if(errorFields.length>0){
+        Swal.fire('⚠️ Veuillez remplir les champs : ' + errorFields.join(', ')); 
+        return; 
+    }
+
+    const cvData = {
+        name: $('#in-name').val(),
+        title: $('#in-title').val(),
+        bio: $('#in-bio').val(),
+        email: $('#in-email').val(),
+        phone: $('#in-phone').val(),
+        location: $('#in-location').val(),
+        linkedin: $('#in-linkedin').val(),
+        photo: photoData,
+        template: $('#template-select').val(),
+        colors: { 
+            header: $('#color-header').val(), 
+            title: $('#color-title').val(), 
+            text: $('#color-text').val() 
+        },
+        experiences: $('#experience-list > div').map(function(){
+            return {
+                company: $(this).find('.in-exp-company').val(),
+                date: $(this).find('.in-exp-date').val(),
+                description: $(this).find('.in-exp-desc').val()
+            };
+        }).get(),
+        skills: $('#skill-list input').map(function(){ return $(this).val(); }).get().filter(Boolean),
+        languages: $('#lang-list input').map(function(){ return $(this).val(); }).get().filter(Boolean),
+        interests: $('#interest-list input').map(function(){ return $(this).val(); }).get().filter(Boolean)
+    };
+
+    let savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
+    savedCVs.push(cvData);
+    localStorage.setItem('savedCVs', JSON.stringify(savedCVs));
+
+    Swal.fire('💾 CV sauvegardé avec succès !');
+    loadSavedCVs();
+}
+
+// Bouton sauvegarder
+$('#save-cv-btn').click(saveCV);
+
+// Export PDF
+$('#export-btn').click(()=>{
+    const opt = {
+        margin: 0.5,
+        filename: 'Mon_CV.pdf',
+        image: {type: 'jpeg', quality: 0.98},
+        html2canvas: {scale: 2, scrollY: 0},
+        jsPDF: {unit: 'in', format: 'a4', orientation: 'portrait'}
+    };
+    html2pdf(document.getElementById('cv-preview-container'), opt);
+});
+
+// Charger CV sauvegardés
+function loadSavedCVs(){
+    const savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
+    const listContainer = $('#saved-cv-list');
+    listContainer.html('');
+    if(savedCVs.length === 0){
+        listContainer.html('<p class="text-gray-500">Aucun CV sauvegardé</p>');
+        return;
+    }
+    savedCVs.forEach((cv,index)=>{
+    const cvItem = $(`
+        <div class="mb-2 p-2 border rounded flex justify-between items-center hover:bg-gray-50">
+            <span>${cv.name} - ${cv.title}</span>
+            <div class="flex gap-2">
+                <button class="text-blue-500 underline text-sm" data-index="${index}">Voir</button>
+                <button class="text-red-500 underline text-sm" data-index="${index}" id="delete-cv">Supprimer</button>
+            </div>
+        </div>
+    `);
+    listContainer.append(cvItem);
+});
+}
+
+// Voir un CV sauvegardé
+$(document).on('click','#saved-cv-list button', function(){
+    const index = $(this).data('index');
+    const savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
+    const cv = savedCVs[index];
+    if(!cv) return;
+    
+    // Supprimer un CV sauvegardé
+$(document).on('click','#saved-cv-list #delete-cv', function(){
+    const index = $(this).data('index');
+    let savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
+    if(index >= 0 && index < savedCVs.length){
+        savedCVs.splice(index, 1); // Supprime le CV sélectionné
+        localStorage.setItem('savedCVs', JSON.stringify(savedCVs));
+        Swal.fire('✅ CV supprimé avec succès !');
+        loadSavedCVs(); // Recharge la liste
+    }
+});
+
+    // Remplir le formulaire
+    $('#in-name').val(cv.name);
+    $('#in-title').val(cv.title);
+    $('#in-bio').val(cv.bio);
+    $('#in-email').val(cv.email);
+    $('#in-phone').val(cv.phone);
+    $('#in-location').val(cv.location);
+    $('#in-linkedin').val(cv.linkedin);
+    $('#template-select').val(cv.template);
+    $('#color-header').val(cv.colors.header);
+    $('#color-title').val(cv.colors.title);
+    $('#color-text').val(cv.colors.text);
+
+    photoData = cv.photo;
+    if(photoData){
+        $('#preview-photo').html(`<img src="${photoData}" class="w-full h-full object-cover rounded-full">`);
+    } else {
+        $('#preview-photo').html(`<span class="text-slate-400">Photo</span>`);
+    }
+
+    // Expériences
+    $('#experience-list').html('');
+    cv.experiences.forEach(exp=>{
+        $('#experience-list').append(`<div class="mb-2">
+            <input type="text" placeholder="Entreprise" class="cv-input in-exp-company" value="${exp.company}">
+            <input type="text" placeholder="Période" class="cv-input in-exp-date" value="${exp.date}">
+            <textarea placeholder="Description" class="cv-textarea in-exp-desc">${exp.description}</textarea>
+            <span class="remove-btn add-btn mt-1">Supprimer</span>
+        </div>`);
+    });
+
+    // Compétences
+    $('#skill-list').html('');
+    cv.skills.forEach(s => $('#skill-list').append(`<input type="text" placeholder="Compétence" class="cv-input in-skill" value="${s}">`));
+
+    // Langues
+    $('#lang-list').html('');
+    cv.languages.forEach(l => $('#lang-list').append(`<input type="text" placeholder="Langue" class="cv-input in-lang" value="${l}">`));
+
+    // Centres d'intérêt
+    $('#interest-list').html('');
+    cv.interests.forEach(i => $('#interest-list').append(`<input type="text" placeholder="Ex: Football, Lecture..." class="cv-input in-interest" value="${i}">`));
+
+    // Mettre à jour l'aperçu
+    updatePreviewEditor();
+});
+
+// Changement de template
+$('#template-select').on('change', function(){
+    const template = $(this).val();
+    $('#cv-preview-container').removeClass('template-modern template-minimal template-creative');
+    $('#cv-preview-container').addClass(`template-${template}`);
+});
+
+// Mise à jour live
+$('input, textarea, select').on('input change', updatePreviewEditor);
+updatePreviewEditor();
+loadSavedCVs();
+</script>
+
+</body>
+</html>

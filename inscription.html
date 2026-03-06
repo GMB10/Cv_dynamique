@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription - CV Generator Pro</title>
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+}
+
+.card-custom {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 2rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg,#8b5cf6 0%,#ec4899 100%);
+    color: white;
+}
+
+.gradient-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <div class="bg-gradient rounded-circle d-flex justify-content-center align-items-center" style="width:40px; height:40px; background: linear-gradient(135deg,#8b5cf6,#ec4899); color:white;">
+        <i class="bi bi-file-earmark-text"></i>
+      </div>
+      CV<span class="text-primary">Gen</span>Pro
+    </a>
+  </div>
+</nav>
+
+<!-- SECTION INSCRIPTION -->
+<section class="d-flex align-items-center justify-content-center min-vh-100 pt-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card card-custom">
+          <h2 class="mb-3">Créez votre compte</h2>
+          <p class="text-muted mb-4">Inscrivez-vous pour commencer à créer votre CV professionnel.</p>
+
+          <!-- Message stylisé -->
+          <div id="register-message" class="alert d-none" role="alert"></div>
+
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Nom complet</label>
+              <input type="text" class="form-control" id="name" placeholder="Nom complet" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="ghislain@Κρύπτερος.com" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirm-password" class="form-label">Confirmer le mot de passe</label>
+              <input type="password" class="form-control" id="confirm-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn gradient-btn w-100 py-2 fw-bold">Créer un compte 🚀</button>
+          </form>
+
+          <p class="mt-4 text-center text-muted">
+            Vous avez déjà un compte ? 
+            <a href="index.html" class="text-primary fw-semibold">Se connecter</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bootstrap JS + jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    $('#registerForm').submit(async function(e){
+        e.preventDefault();
+
+        const fullname = $('#name').val().trim();
+        const email = $('#email').val().trim();
+        const password = $('#password').val();
+        const confirm = $('#confirm-password').val();
+
+        const messageDiv = $('#register-message');
+        messageDiv.removeClass('alert-success alert-danger').addClass('d-none');
+
+        // Vérification mot de passe minimum 6 caractères
+        if(password.length < 6){
+            messageDiv.removeClass('d-none').addClass('alert alert-danger').text('⚠️ Le mot de passe doit contenir au moins 6 caractères.');
+            $('#password').focus();
+            return false;
+        }
+
+        // Vérification correspondance mot de passe
+        if(password !== confirm){
+            messageDiv.removeClass('d-none').addClass('alert alert-danger').text('⚠️ Les mots de passe ne correspondent pas.');
+            $('#confirm-password').focus();
+            return false;
+        }
+
+        // Envoi de la requête
+        try {
+            const res = await fetch('api/register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullname, email, password })
+            });
+
+            const result = await res.json();
+
+            if(result.success) {
+                messageDiv.removeClass('d-none').addClass('alert alert-success').text('✅ ' + result.message);
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+            } else {
+                messageDiv.removeClass('d-none').addClass('alert alert-danger').text('⚠️ ' + result.message);
+            }
+        } catch(err) {
+            console.error(err);
+            messageDiv.removeClass('d-none').addClass('alert alert-danger').text('⚠️ Une erreur est survenue lors de l\'inscription.');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
