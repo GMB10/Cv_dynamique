@@ -1,712 +1,310 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Éditeur CV - CV Generator Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVGenPro G_S_R — Creative Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,900;1,700&family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
 
-<!-- Tailwind + Google Fonts -->
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
-
-<!-- html2pdf.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<style>
-body {
-    font-family: 'Inter', sans-serif;
-    background: #f4f6f8;
-    margin: 0;
-    padding-top: 80px;
-}
-
-/* Navbar */
-nav {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    z-index: 50;
-    backdrop-filter: blur(10px);
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Carte verre */
-.glass-card {
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 2rem;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
-
-/* Boutons */
-.gradient-bg {
-    background: linear-gradient(135deg, #6b5bff 0%, #ff5b7d 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.gradient-bg:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-}
-.add-btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: white;
-    background: linear-gradient(135deg,#6b5bff 0%,#ff5b7d 100%);
-    border-radius: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.add-btn:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* CV container */
-#cv-preview-container {
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s ease;
-    --color-header: #6b5bff;
-    --color-title: #6b5bff;
-    --color-text: #1e293b;
-    width: 100%;
-    max-width: 900px;
-    margin: 2rem auto;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-/* Templates */
-
-/* ---------- Modern Template ---------- */
-.template-modern {
-    display: flex;
-    flex-direction: row;
-    background: #ffffff;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.template-modern #cv-left {
-    flex: 1;
-    background: var(--color-header, #6b5bff);
-    color: white;
-    text-align: center;
-    padding: 2rem 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: start;
-    gap: 1rem;
-}
-
-.template-modern #cv-left h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-top: 1rem;
-}
-
-.template-modern #cv-left h3 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: rgba(255,255,255,0.85);
-}
-
-/* Photo - Moderne Template */
-.template-modern #preview-photo {
-    width: 120px;            /* Taille plus grande que minimaliste */
-    height: 120px;
-    border-radius: 50%;      /* Cercle parfait */
-    overflow: hidden;
-    border: 3px solid white; /* Contraste avec le fond coloré */
-    margin: 0 auto 1rem auto; /* Centrée et espace avec le nom */
-    background: #f3f4f6;     /* Couleur de fond neutre */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.template-modern #preview-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;       /* Remplit le cercle sans déformation */
-}
-
-.template-modern h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid var(--color-header, #6b5bff);
-    padding-bottom: 0.25rem;
-}
-
-.template-modern p, 
-.template-modern li, 
-.template-modern span {
-    font-size: 0.95rem;
-    color: var(--color-text, #1e293b);
-    line-height: 1.5;
-}
-
-/* ---------- Minimal Template ---------- */
-/* Photo - Minimal Template */
-.template-minimal #preview-photo {
-    width: 100px;            /* Taille raisonnable */
-    height: 100px;
-    border-radius: 50%;      /* Cercle parfait */
-    overflow: hidden;
-    border: 2px solid var(--color-header, #6b5bff); /* bord discret */
-    margin-bottom: 1rem;
-    background: #f3f4f6;     /* Couleur neutre si pas de photo */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.template-minimal #preview-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;       /* Remplit le cercle sans déformation */
-}
-.template-minimal #cv-left,
-.template-minimal #cv-right {
-    flex: unset;
-    padding: 1rem;
-    text-align: left;
-}
-
-.template-minimal #cv-left h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-header, #6b5bff);
-}
-
-.template-minimal #cv-left h3 {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0.25rem;
-    color: var(--color-title, #6b5bff);
-}
-
-.template-minimal #cv-right h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-top: 1rem;
-    margin-bottom: 0.25rem;
-    color: var(--color-header, #6b5bff);
-    border-left: 3px solid var(--color-header, #6b5bff);
-    padding-left: 0.5rem;
-}
-
-.template-minimal p, 
-.template-minimal li, 
-.template-minimal span {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--color-text, #1e293b);
-}
-
-#preview-skills li,
-#preview-langs li,
-#preview-interests li {
-    display: inline-block;
-    margin: 0.25rem 0.25rem 0.25rem 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.85rem;
-    border-radius: 0.25rem;
-    background: var(--color-header, #6b5bff);
-    color: white;
-}
-
-/* ---------- Responsive adjustments ---------- */
-@media (max-width: 768px) {
-    .template-modern {
-        flex-direction: column;
-    }
-    .template-modern #cv-left,
-    .template-modern #cv-right {
-        padding: 1.5rem;
-        text-align: center;
-    }
-    .template-modern #cv-left h2 {
-        font-size: 1.4rem;
-    }
-    .template-modern #cv-left h3 {
-        font-size: 1rem;
-    }
-
-    .template-minimal {
-        padding: 1.5rem;
-    }
-}
-
-/* Créatif amélioré */
-.template-creative {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.template-creative #cv-header {
-    background: linear-gradient(135deg,#6b5bff,#ff5b7d);
-    color: white;
-    text-align: center;
-    font-weight: 700;
-    font-size: 2rem;
-    padding: 3rem 1rem 4rem 1rem;
-    position: relative;
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
-}
-
-.template-creative #preview-photo {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    border: 4px solid white;
-    position: absolute;
-    bottom: -65px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.template-creative #cv-right {
-    padding: 5rem 2rem 2rem 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.8rem;
-}
-
-.template-creative .section-card {
-    background: #f9fafb;
-    border-left: 5px solid var(--color-header);
-    padding: 1rem 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.template-creative .section-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-}
-
-.template-creative h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 0.25rem;
-}
-.template-creative h3 {
-    font-size: 1.3rem;
-    font-weight: 500;
-    text-align: center;
-    color: #fff;
-    margin-bottom: 1rem;
-}
-
-/* Badges compétences/langues/intérêts */
-.template-creative ul li {
-    display: inline-block;
-    margin: 0.25rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 1rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(135deg,#ff5b7d,#6b5bff);
-    transition: transform 0.2s ease;
-}
-.template-creative ul li:hover {
-    transform: scale(1.05);
-}
-
-/* Responsive */
-@media (max-width:768px){
-    .template-modern{flex-direction:column;}
-    .template-creative #preview-photo{width:100px;height:100px;bottom:-50px;}
-    .template-creative #cv-right{padding:3rem 1rem 1rem 1rem;}
-}
-</style>
+    <style>
+        :root { --brand-purple: #8b5cf6; --brand-pink: #d946ef; --bg-main: #f8fafc; }
+        body { background: var(--bg-main); font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 1.5rem; }
+        .btn-grad { background: linear-gradient(90deg, var(--brand-purple), var(--brand-pink)); color: white; transition: 0.3s; font-weight: 700; }
+        .btn-grad:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3); }
+        .input-pro { border: 1.5px solid #e2e8f0; border-radius: 0.75rem; padding: 10px 14px; width: 100%; font-size: 13px; transition: 0.2s; }
+        .input-pro:focus { border-color: var(--brand-purple); outline: none; background: white; }
+        .input-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+        #viewport-container { height: calc(100vh - 140px); background: #cbd5e1; border-radius: 2rem; display: flex; justify-content: center; overflow-y: auto; padding: 40px; }
+        #cv-paper { width: 210mm; min-height: 297mm; background: white; transform: scale(0.65); transform-origin: top center; box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
+        .archive-card { background: white; padding: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid #edf2f7; }
+        #full-preview { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 9999; backdrop-filter: blur(10px); padding: 20px; overflow-y: auto; flex-direction: column; align-items: center; }
+        #full-preview.active { display: flex; }
+        .section-label { font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; display: block; }
+    </style>
 </head>
-<body>
+<body class="p-4 md:p-6">
 
-<!-- Navbar -->
-<nav>
-    <div class="flex items-center gap-2 font-bold text-2xl tracking-tight">
-        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center text-white">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-        </div>
-        <span>CV<span class="text-indigo-600">Gen</span><span class="text-slate-400">Pro</span></span>
+<nav class="flex justify-between items-center mb-6 glass p-4">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 btn-grad flex items-center justify-center rounded-xl"><i data-lucide="zap"></i></div>
+        <span class="text-xl font-black tracking-tight">CVGen<span class="text-purple-600">Pro</span></span>
     </div>
-    <div class="flex items-center gap-4">
-        <span id="user-name" class="font-semibold text-gray-700"></span>
-        <button onclick="logout()" class="text-sm text-red-500 hover:underline">Déconnexion</button>
+    <div class="flex gap-3">
+        <button onclick="toggleFullView()" class="p-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"><i data-lucide="maximize" class="w-4"></i></button>
+        <button onclick="handleExport()" class="btn-grad px-6 py-3 rounded-xl text-sm">PDF EXPORT</button>
     </div>
 </nav>
 
-<div class="max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-3 gap-8">
+<div class="grid lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-4 h-[calc(100vh-140px)] overflow-y-auto pr-2 space-y-4">
+        
+        <div class="glass p-5 border-2 border-purple-50">
+            <span class="section-label text-purple-600">Gestion de Projet</span>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="project-name" placeholder="Nom du fichier *" class="input-pro font-bold">
+                <button onclick="saveToArchives()" class="btn-grad px-4 rounded-xl"><i data-lucide="save"></i></button>
+            </div>
+            <div id="archives-list" class="max-h-32 overflow-y-auto"></div>
+        </div>
 
-<!-- Formulaire -->
-<div class="space-y-6 col-span-1">
-    <h2 class="text-2xl font-bold">Informations personnelles</h2>
-    <input type="text" id="in-name" placeholder="Nom complet *" class="cv-input required">
-    <input type="text" id="in-title" placeholder="Poste visé *" class="cv-input required">
-    <textarea id="in-bio" placeholder="À propos de vous..." class="cv-textarea"></textarea>
-    <input type="email" id="in-email" placeholder="Email *" class="cv-input required">
-    <input type="text" id="in-phone" placeholder="Téléphone *" class="cv-input required">
-    <input type="text" id="in-location" placeholder="Ville, Pays" class="cv-input">
-    <input type="text" id="in-linkedin" placeholder="LinkedIn" class="cv-input">
-
-    <h3 class="section-title mt-4">Photo de profil</h3>
-    <input type="file" id="in-photo" accept="image/*" class="cv-input">
-
-    <h3 class="section-title mt-4">Personnaliser les couleurs</h3>
-    <label>En-tête: <input type="color" id="color-header" value="#6b5bff"></label><br>
-    <label>Titre: <input type="color" id="color-title" value="#6b5bff"></label><br>
-    <label>Texte: <input type="color" id="color-text" value="#1e293b"></label>
-
-    <h3 class="section-title mt-4">Template</h3>
-    <select id="template-select" class="cv-input">
-        <option value="modern">Moderne</option>
-        <option value="minimal">Minimal</option>
-        <option value="creative">Créatif</option>
-    </select>
-
-    <h3 class="section-title mt-4">Expériences professionnelles</h3>
-    <div id="experience-list"></div>
-    <span id="add-exp" class="add-btn mt-1">+ Ajouter expérience</span>
-
-    <h3 class="section-title mt-4">Compétences</h3>
-    <div id="skill-list"></div>
-    <span id="add-skill" class="add-btn mt-1">+ Ajouter compétence</span>
-
-    <h3 class="section-title mt-4">Langues</h3>
-    <div id="lang-list"></div>
-    <span id="add-lang" class="add-btn mt-1">+ Ajouter langue</span>
-
-    <h3 class="section-title mt-4">Centres d'intérêt</h3>
-    <div id="interest-list"></div>
-    <span id="add-interest" class="add-btn mt-1">+ Ajouter centre d'intérêt</span>
-
-    <button id="save-cv-btn" class="gradient-bg py-3 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition mt-4">
-        💾 Enregistrer le CV
-    </button>
-
-    <h3 class="section-title mt-6">CV sauvegardés</h3>
-    <div id="saved-cv-list"></div>
-</div>
-
-<!-- CV Preview -->
-<div class="lg:col-span-2 flex flex-col gap-4">
-    <div id="cv-preview-container" class="rounded-xl shadow-lg overflow-hidden template-creative">
-        <div id="cv-header">
-            <div id="preview-name">Nom Complet</div>
-            <div id="preview-title">Poste Visé</div>
-            <div id="preview-photo">
-                <span class="text-slate-400">Photo</span>
+        <div class="glass p-5">
+            <span class="section-label text-blue-600">Design & Profil</span>
+            <select id="cv-template" class="input-pro font-bold mb-4 bg-slate-50 border-none cursor-pointer">
+                <optgroup label="Tes Classiques">
+                    <option value="modern">Sidebar Pro</option>
+                    <option value="bento">Bento Dashboard</option>
+                </optgroup>
+                <optgroup label="Nouveautés G_S_R">
+                    <option value="swiss">Swiss Grid (Minimaliste)</option>
+                    <option value="neon">Neon Dark (Tech/Gaming)</option>
+                    <option value="legacy">Legacy Paper (Journalisme)</option>
+                    <option value="tokyo">Tokyo Architect (Géométrique)</option>
+                </optgroup>
+            </select>
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <input type="color" id="theme-color" value="#7c3aed" class="w-full h-10 rounded-lg cursor-pointer col-span-1">
+                <label for="photo-file" class="col-span-2 cursor-pointer h-10 border-2 border-dashed rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-400">AJOUTER PHOTO</label>
+                <input type="file" id="photo-file" class="hidden" accept="image/*">
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="full-name" placeholder="Prénom NOM *" class="input-pro font-black text-lg">
+                <input type="text" id="target-job" placeholder="Poste visé *" class="input-pro text-purple-600 font-bold">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="user-email" placeholder="Email (Validation) *" class="input-pro text-xs">
+                    <input type="text" id="user-phone" placeholder="Téléphone (SN) *" class="input-pro text-xs">
+                </div>
+                <textarea id="user-bio" placeholder="Introduction professionnelle *..." class="input-pro h-20 text-xs"></textarea>
             </div>
         </div>
-        <div id="cv-right">
-            <div class="section-card" id="preview-bio">À propos de vous...</div>
-            <div class="section-card">
-                <h4>Contact</h4>
-                <p>Email: <span id="preview-email">exemple@mail.com</span></p>
-                <p>Téléphone: <span id="preview-phone">+221 77 123 45 67</span></p>
-                <p>Localisation: <span id="preview-location">Ville, Pays</span></p>
-                <p>LinkedIn: <span id="preview-linkedin">linkedin.com/in/exemple</span></p>
+
+        <div class="glass p-5">
+            <div class="flex justify-between items-center mb-4">
+                <span class="section-label text-emerald-600 m-0">Expériences</span>
+                <button onclick="addListEntry('exp')" class="w-7 h-7 btn-grad flex items-center justify-center rounded-lg"><i data-lucide="plus" class="w-4"></i></button>
             </div>
-            <div class="section-card">
-                <h4>Expériences</h4>
-                <div id="preview-experience"></div>
+            <div id="exp-list" class="space-y-3"></div>
+        </div>
+
+        <div class="glass p-5">
+            <div class="flex justify-between items-center mb-4">
+                <span class="section-label text-orange-600 m-0">Formations</span>
+                <button onclick="addListEntry('edu')" class="w-7 h-7 btn-grad flex items-center justify-center rounded-lg"><i data-lucide="plus" class="w-4"></i></button>
             </div>
-            <div class="section-card">
-                <h4>Compétences</h4>
-                <ul id="preview-skills" class="flex flex-wrap gap-2"></ul>
-            </div>
-            <div class="section-card">
-                <h4>Langues</h4>
-                <ul id="preview-langs" class="flex flex-wrap gap-2"></ul>
-            </div>
-            <div class="section-card">
-                <h4>Centres d'intérêt</h4>
-                <ul id="preview-interests" class="flex flex-wrap gap-2"></ul>
-            </div>
+            <div id="edu-list" class="space-y-3"></div>
+        </div>
+
+        <div class="glass p-5">
+            <span class="section-label text-pink-600">Compétences & Langues</span>
+            <input type="text" id="user-skills" placeholder="Docker, UI Design, Gestion..." class="input-pro mb-3 text-xs">
+            <div id="lang-list" class="space-y-2"></div>
+            <button onclick="addListEntry('lang')" class="w-full mt-2 py-2 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-bold text-slate-400 uppercase">+ Langue</button>
         </div>
     </div>
 
-    <button id="export-btn" class="gradient-bg py-3 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition mt-2">
-        📄 Exporter le CV en PDF
-    </button>
+    <div class="lg:col-span-8">
+        <div id="viewport-container">
+            <div id="cv-paper"></div>
+        </div>
+    </div>
 </div>
+
+<div id="full-preview">
+    <div class="w-full max-w-4xl flex justify-between items-center mb-6 text-white">
+        <span class="font-black text-xl tracking-widest">G_S_R PREVIEW MODE</span>
+        <button onclick="toggleFullView()" class="p-2 bg-white/10 rounded-full hover:bg-red-500"><i data-lucide="x"></i></button>
+    </div>
+    <div id="preview-target"></div>
 </div>
 
 <script>
-lucide.createIcons();
-let photoData = null;
+    let currentData = {
+        photo: null,
+        exp: [{t: "Sénior Product Designer", c: "Innovate Studio", d: "Direction artistique et gestion d'une équipe de 4 juniors."}],
+        edu: [{t: "Master Design Global", c: "École Boulle Paris", d: ""}],
+        lang: [{n: "Anglais", l: "C1 - Courant"}]
+    };
+    let archives = JSON.parse(localStorage.getItem('cv_archives')) || [];
 
-// User session
-const user = JSON.parse(localStorage.getItem('user'));
-if(user && user.fullname){ $('#user-name').text(user.fullname); }
-else { location.href='index.html'; }
+    $(document).ready(() => { refreshArchivesUI(); renderAll(); lucide.createIcons(); });
 
-function logout(){ localStorage.removeItem('user'); location.href='index.html'; }
+    // --- LOGIQUE DE VALIDATION G_S_R ---
+    function validateForm() {
+        let errors = [];
+        $('.input-pro').removeClass('input-error');
 
-// Photo upload
-$('#in-photo').on('change', function(e){
-    const file = e.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(ev){ 
-            photoData = ev.target.result;
-            $('#preview-photo').html(`<img src="${photoData}" class="w-full h-full object-cover rounded-full">`); 
+        // Vérification champs vides
+        const required = {
+            '#project-name': "Nom du fichier",
+            '#full-name': "Nom complet",
+            '#target-job': "Poste visé",
+            '#user-bio': "Introduction/Bio"
+        };
+
+        for (let id in required) {
+            if (!$(id).val().trim()) {
+                $(id).addClass('input-error');
+                errors.push(`Le champ "${required[id]}" est vide.`);
+            }
         }
-        reader.readAsDataURL(file);
-    } else {
-        photoData=null; 
-        $('#preview-photo').html(`<span class="text-slate-400">Photo</span>`);
+
+        // Validation Email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test($('#user-email').val())) {
+            $('#user-email').addClass('input-error');
+            errors.push("L'adresse email est invalide.");
+        }
+
+        // Validation Téléphone Sénégal (77, 78, 76, 70, 33 suivis de 7 chiffres)
+        const snPhoneRegex = /^(221|00221|\+221)?(77|78|76|70|33)\d{7}$/;
+        const phoneVal = $('#user-phone').val().replace(/\s+/g, ''); // Enlever les espaces
+        if (!snPhoneRegex.test(phoneVal)) {
+            $('#user-phone').addClass('input-error');
+            errors.push("Le numéro de téléphone n'est pas au format Sénégalais valide.");
+        }
+
+        if (errors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Données manquantes ou invalides',
+                html: `<div class="text-left text-sm">${errors.map(e => `• ${e}`).join('<br>')}</div>`,
+                confirmButtonColor: '#8b5cf6'
+            });
+            return false;
+        }
+        return true;
     }
-});
 
-// Add dynamic fields
-$('#add-exp').click(()=>$('#experience-list').append(`<div class="mb-2">
-    <input type="text" placeholder="Entreprise" class="cv-input in-exp-company">
-    <input type="text" placeholder="Période" class="cv-input in-exp-date">
-    <textarea placeholder="Description" class="cv-textarea in-exp-desc"></textarea>
-    <span class="remove-btn add-btn mt-1">Supprimer</span>
-</div>`));
-$('#add-skill').click(()=>$('#skill-list').append(`<input type="text" placeholder="Compétence" class="cv-input in-skill">`));
-$('#add-lang').click(()=>$('#lang-list').append(`<input type="text" placeholder="Langue" class="cv-input in-lang">`));
-$('#add-interest').click(()=>$('#interest-list').append(`<input type="text" placeholder="Ex: Football, Lecture..." class="cv-input in-interest">`));
-$(document).on('click','.remove-btn', function(){ $(this).parent().remove(); updatePreviewEditor(); });
+    function addListEntry(type) {
+        if(type === 'lang') currentData.lang.push({n: "Langue", l: "Niveau"});
+        else currentData[type].push({t: "Titre", c: "Lieu", d: "Description..."});
+        renderAll();
+    }
 
-// Update preview
-function updatePreviewEditor(){
-    $('#preview-name').text($('#in-name').val()||'Nom Complet');
-    $('#preview-title').text($('#in-title').val()||'Poste Visé');
-    $('#preview-bio').text($('#in-bio').val()||'À propos de vous...');
-    $('#preview-email').text($('#in-email').val()||'exemple@mail.com');
-    $('#preview-phone').text($('#in-phone').val()||'+221 77 123 45 67');
-    $('#preview-location').text($('#in-location').val()||'Ville, Pays');
-    $('#preview-linkedin').text($('#in-linkedin').val()||'linkedin.com/in/exemple');
+    function removeListEntry(type, idx) { currentData[type].splice(idx, 1); renderAll(); }
+    function updateEntryValue(type, idx, field, val) { currentData[type][idx][field] = val; renderCV(); }
 
-    const headerColor = $('#color-header').val()||'#6b5bff';
-    const titleColor = $('#color-title').val()||'#6b5bff';
-    const textColor = $('#color-text').val()||'#1e293b';
-    $('#cv-preview-container').css('--color-header', headerColor).css('--color-title', titleColor).css('--color-text', textColor);
+    function renderInputLists() {
+        ['exp', 'edu'].forEach(type => {
+            const list = $(`#${type}-list`).empty();
+            currentData[type].forEach((item, i) => {
+                list.append(`
+                    <div class="p-3 bg-slate-50 rounded-xl relative border border-slate-100">
+                        <input oninput="updateEntryValue('${type}', ${i}, 't', this.value)" value="${item.t}" class="font-bold text-xs w-full bg-transparent border-none p-0 focus:ring-0">
+                        <input oninput="updateEntryValue('${type}', ${i}, 'c', this.value)" value="${item.c}" class="text-[10px] text-purple-600 w-full bg-transparent border-none p-0 focus:ring-0 uppercase font-bold tracking-tighter">
+                        <textarea oninput="updateEntryValue('${type}', ${i}, 'd', this.value)" class="text-[11px] text-slate-400 w-full bg-transparent border-none p-0 focus:ring-0 h-10 resize-none">${item.d}</textarea>
+                        <button onclick="removeListEntry('${type}', ${i})" class="absolute top-2 right-2 text-slate-300 hover:text-red-500">&times;</button>
+                    </div>`);
+            });
+        });
+        const lList = $('#lang-list').empty();
+        currentData.lang.forEach((l, i) => {
+            lList.append(`
+                <div class="flex gap-2 items-center">
+                    <input oninput="updateEntryValue('lang', ${i}, 'n', this.value)" value="${l.n}" class="input-pro py-1 text-xs font-bold">
+                    <input oninput="updateEntryValue('lang', ${i}, 'l', this.value)" value="${l.l}" class="input-pro py-1 text-xs text-slate-500">
+                    <button onclick="removeListEntry('lang', ${i})" class="text-red-300">×</button>
+                </div>`);
+        });
+    }
 
-    let expHTML=''; 
-    $('#experience-list > div').each(function(){
-        const company=$(this).find('.in-exp-company').val();
-        const date=$(this).find('.in-exp-date').val();
-        const desc=$(this).find('.in-exp-desc').val();
-        if(company||date||desc) expHTML+=`<p><b>${company}</b> (${date}): ${desc}</p>`;
+    // (Code des modèles CV modern, bento, swiss, neon, legacy, tokyo inchangé...)
+    // Inclure ici la fonction renderCV() identique au code précédent pour la cohérence
+    function renderCV() {
+        const tmpl = $('#cv-template').val();
+        const accent = $('#theme-color').val();
+        const skills = ($('#user-skills').val() || "").split(',').filter(s => s.trim() !== "");
+        const profile = {
+            name: $('#full-name').val() || "VOTRE NOM",
+            job: $('#target-job').val() || "INTITULÉ DU POSTE",
+            email: $('#user-email').val() || "contact@email.com",
+            phone: $('#user-phone').val() || "06 00 00 00 00",
+            bio: $('#user-bio').val() || "Présentez-vous ici..."
+        };
+        const imgTag = currentData.photo ? `<img src="${currentData.photo}" class="w-full h-full object-cover">` : `<div class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400"><i data-lucide="user"></i></div>`;
+        
+        // --- LOGIQUE DES TEMPLATES (REPRISE À L'IDENTIQUE) ---
+        let html = "";
+        if(tmpl === 'modern') {
+            html = `<div class="flex h-full"><div class="w-1/3 p-10 text-white" style="background:${accent}"><div class="w-32 h-32 mx-auto rounded-2xl overflow-hidden mb-6 shadow-xl">${imgTag}</div><h2 class="text-2xl font-black text-center mb-10">${profile.name}</h2><div class="space-y-4 text-[10px] mb-10 uppercase tracking-widest font-bold opacity-80"><p>${profile.email}</p><p>${profile.phone}</p></div><div class="mb-10"><h4 class="text-xs font-black border-b border-white/20 pb-2 mb-4 uppercase">Skills</h4><div class="flex flex-wrap gap-2">${skills.map(s => `<span class="bg-white/10 px-2 py-1 rounded text-[9px] font-bold">${s}</span>`).join('')}</div></div><div><h4 class="text-xs font-black border-b border-white/20 pb-2 mb-4 uppercase">Langues</h4>${currentData.lang.map(l => `<p class="text-[10px] mb-1"><b>${l.n}</b> - ${l.l}</p>`).join('')}</div></div><div class="flex-1 p-12 bg-white space-y-8"><section><h3 class="text-xs font-black tracking-[4px] mb-4 uppercase" style="color:${accent}">Profil</h3><p class="text-sm text-slate-500 leading-relaxed">${profile.bio}</p></section><section><h3 class="text-xs font-black tracking-[4px] mb-4 uppercase" style="color:${accent}">Expériences</h3><div class="space-y-6">${currentData.exp.map(e => `<div class="border-l-2 pl-4" style="border-color:${accent}40"><p class="text-sm font-black">${e.t}</p><p class="text-[10px] font-bold text-slate-300 uppercase">${e.c}</p><p class="text-xs text-slate-500 mt-2">${e.d}</p></div>`).join('')}</div></section><section><h3 class="text-xs font-black tracking-[4px] mb-4 uppercase" style="color:${accent}">Éducation</h3><div class="space-y-4">${currentData.edu.map(e => `<div><p class="text-sm font-black">${e.t}</p><p class="text-xs text-slate-400 font-bold uppercase">${e.c}</p></div>`).join('')}</div></section></div></div>`;
+        } else if(tmpl === 'bento') {
+            html = `<div class="p-8 bg-slate-100 h-full grid grid-cols-12 gap-4"><div class="col-span-8 bg-white p-8 rounded-[2rem] shadow-sm flex items-center gap-6"><div class="w-24 h-24 rounded-3xl overflow-hidden shrink-0 shadow-lg">${imgTag}</div><div><h1 class="text-3xl font-black">${profile.name}</h1><p class="text-lg font-bold" style="color:${accent}">${profile.job}</p></div></div><div class="col-span-4 bg-slate-900 text-white p-8 rounded-[2rem] flex flex-col justify-center"><p class="text-[11px] font-bold opacity-50 uppercase tracking-widest">${profile.email}</p><p class="text-[11px] font-bold opacity-50 uppercase tracking-widest">${profile.phone}</p></div><div class="col-span-7 bg-white p-8 rounded-[2rem] shadow-sm space-y-8"><div><h4 class="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-6">Parcours</h4><div class="space-y-6">${currentData.exp.map(e => `<div><p class="text-xs font-black">${e.t}</p><p class="text-[10px] font-black uppercase mb-1" style="color:${accent}">${e.c}</p><p class="text-[10px] text-slate-400">${e.d}</p></div>`).join('')}</div></div><div><h4 class="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-6">Études</h4><div class="space-y-4">${currentData.edu.map(e => `<div><p class="text-xs font-bold">${e.t}</p><p class="text-[10px] font-black opacity-50 uppercase">${e.c}</p></div>`).join('')}</div></div></div><div class="col-span-5 flex flex-col gap-4"><div class="bg-indigo-50 p-8 rounded-[2rem] flex-1"><h4 class="text-[10px] font-black uppercase text-indigo-900 mb-6">Stack & Langues</h4><div class="flex flex-wrap gap-2 mb-8">${skills.map(s => `<span class="bg-white px-3 py-1 rounded-full text-[10px] font-black shadow-sm text-indigo-600">${s}</span>`).join('')}</div><div class="space-y-2">${currentData.lang.map(l => `<p class="text-[10px] font-bold">${l.n} <span class="text-indigo-300">/ ${l.l}</span></p>`).join('')}</div></div></div></div>`;
+        } else if(tmpl === 'swiss') {
+            html = `<div class="h-full bg-white p-16 font-sans"><div class="grid grid-cols-12 border-t-8 border-black pt-10"><div class="col-span-8"><h1 class="text-6xl font-black uppercase leading-[0.8] mb-4">${profile.name}</h1><p class="text-2xl font-light tracking-tighter text-slate-400 uppercase">${profile.job}</p></div><div class="col-span-4 text-right text-[11px] font-bold uppercase space-y-1"><p>${profile.email}</p><p>${profile.phone}</p></div></div><div class="grid grid-cols-12 mt-20 gap-10"><div class="col-span-4"><span class="block h-1 bg-black w-8 mb-4"></span><h3 class="text-xs font-black uppercase mb-10">Expériences</h3></div><div class="col-span-8 space-y-10">${currentData.exp.map(e => `<div class="grid grid-cols-2 gap-4"><p class="text-sm font-black uppercase">${e.t} — <span class="font-normal text-slate-400">${e.c}</span></p><p class="text-xs text-slate-500">${e.d}</p></div>`).join('')}</div></div><div class="grid grid-cols-12 mt-20 gap-10"><div class="col-span-4"><span class="block h-1 bg-black w-8 mb-4"></span><h3 class="text-xs font-black uppercase">Compétences</h3></div><div class="col-span-8 flex flex-wrap gap-x-8 gap-y-2 text-sm font-black uppercase">${skills.map(s => `<span>${s}</span>`).join('')}</div></div></div>`;
+        } else if(tmpl === 'neon') {
+            html = `<div class="h-full bg-[#050505] p-12 text-white font-['Space_Grotesk']"><div class="flex justify-between items-start mb-16 border-b border-white/10 pb-10"><div><h1 class="text-5xl font-black tracking-tighter mb-2 italic" style="text-shadow: 0 0 10px ${accent}">${profile.name}</h1><p class="text-xl font-bold uppercase opacity-50" style="color:${accent}">${profile.job}</p></div><div class="w-24 h-24 border-2 p-1 rounded-full" style="border-color:${accent}">${imgTag}</div></div><div class="grid grid-cols-3 gap-10"><div class="col-span-1 space-y-10"><div class="p-4 bg-white/5 rounded-2xl border-l-4" style="border-color:${accent}"><h3 class="text-xs font-black uppercase mb-4 text-slate-500">Stack</h3><div class="flex flex-wrap gap-2">${skills.map(s => `<span class="text-[10px] px-2 py-1 bg-white/10 rounded">${s}</span>`).join('')}</div></div><div class="p-4 bg-white/5 rounded-2xl border-l-4" style="border-color:${accent}"><h3 class="text-xs font-black uppercase mb-4 text-slate-500">Contact</h3><p class="text-[10px] break-all">${profile.email}</p><p class="text-[10px] mt-2">${profile.phone}</p></div></div><div class="col-span-2 space-y-8"><h3 class="text-[10px] font-black uppercase tracking-[4px]" style="color:${accent}">01. Expériences</h3><div class="space-y-6">${currentData.exp.map(e => `<div><p class="text-lg font-bold">${e.t}</p><p class="text-[10px] font-black uppercase opacity-40 mb-2">${e.c}</p><p class="text-xs text-slate-400 leading-relaxed">${e.d}</p></div>`).join('')}</div></div></div></div>`;
+        } else if(tmpl === 'legacy') {
+            html = `<div class="h-full bg-[#fdfcf8] p-16 font-serif text-[#1a1a1a]"><div class="text-center border-b-2 border-black pb-8 mb-8"><h1 class="text-6xl font-black mb-4">${profile.name}</h1><div class="flex justify-center gap-10 text-[11px] font-sans font-black uppercase tracking-[2px]"><span>${profile.job}</span> <span>•</span> <span>${profile.email}</span> <span>•</span> <span>${profile.phone}</span></div></div><div class="columns-2 gap-12 font-sans text-xs leading-relaxed text-justify"><div class="mb-8"><p class="first-letter:text-5xl first-letter:font-black first-letter:float-left first-letter:mr-3 first-letter:mt-1">${profile.bio}</p></div><h3 class="font-black uppercase border-b border-black mb-4 text-sm">Parcours</h3>${currentData.exp.map(e => `<div class="mb-6"><p class="font-black italic text-[13px]">${e.t}</p><p class="font-bold uppercase text-[9px] mb-2">${e.c}</p><p>${e.d}</p></div>`).join('')}<h3 class="font-black uppercase border-b border-black mb-4 text-sm">Expertise</h3><div class="flex flex-wrap gap-4 mb-6 font-bold uppercase text-[10px]">${skills.map(s => `<span>${s}</span>`).join('')}</div><h3 class="font-black uppercase border-b border-black mb-4 text-sm">Formation</h3>${currentData.edu.map(e => `<div class="mb-4"><p class="font-bold">${e.t}</p><p class="italic text-[11px]">${e.c}</p></div>`).join('')}</div></div>`;
+        } else if(tmpl === 'tokyo') {
+            html = `<div class="h-full bg-white flex overflow-hidden"><div class="w-20 bg-black flex flex-col items-center py-10 gap-10 text-white"><div class="rotate-[-90deg] whitespace-nowrap font-black tracking-[10px] text-xs uppercase opacity-30 origin-center w-0">RESUME</div><div class="rotate-[-90deg] whitespace-nowrap font-black tracking-[10px] text-xs uppercase opacity-30 origin-center w-0 mt-40">2026</div></div><div class="flex-1 p-16 relative"><div class="absolute top-16 right-16 w-32 h-32 z-10 bg-slate-100 overflow-hidden" style="clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);">${imgTag}</div><h1 class="text-7xl font-black tracking-tighter leading-none mb-4">${profile.name.split(' ')[0]}<br><span style="color:${accent}">${profile.name.split(' ')[1] || ''}</span></h1><p class="text-xs font-black uppercase tracking-[8px] text-slate-400 mb-20">${profile.job}</p><div class="grid grid-cols-2 gap-16"><section><h4 class="text-[10px] font-black uppercase mb-6 flex items-center gap-2"><span class="w-8 h-[1px] bg-black"></span> Expériences</h4><div class="space-y-8">${currentData.exp.map(e => `<div><p class="font-black text-sm uppercase">${e.t}</p><p class="text-[10px] text-slate-400 font-bold mb-2 uppercase">${e.c}</p><p class="text-xs leading-loose">${e.d}</p></div>`).join('')}</div></section><section><h4 class="text-[10px] font-black uppercase mb-6 flex items-center gap-2"><span class="w-8 h-[1px] bg-black"></span> Skills</h4><div class="flex flex-wrap gap-2 mb-10">${skills.map(s => `<span class="border border-black px-2 py-1 text-[9px] font-black uppercase">${s}</span>`).join('')}</div><h4 class="text-[10px] font-black uppercase mb-6 flex items-center gap-2"><span class="w-8 h-[1px] bg-black"></span> Études</h4><div class="space-y-4">${currentData.edu.map(e => `<div><p class="text-xs font-black uppercase">${e.t}</p><p class="text-[10px] text-slate-400">${e.c}</p></div>`).join('')}</div></section></div></div></div>`;
+        }
+
+        $('#cv-paper').html(html);
+        lucide.createIcons();
+    }
+
+    function renderAll() { renderInputLists(); renderCV(); }
+
+    function saveToArchives() {
+        if (!validateForm()) return; // ARRÊT SI INVALIDE
+        const name = $('#project-name').val() || "CV_Temp";
+        const snap = { id: Date.now(), projectName: name, content: { ...currentData, ui: { name: $('#full-name').val(), job: $('#target-job').val(), email: $('#user-email').val(), phone: $('#user-phone').val(), bio: $('#user-bio').val(), skills: $('#user-skills').val(), tmpl: $('#cv-template').val(), color: $('#theme-color').val() } } };
+        archives.push(snap); localStorage.setItem('cv_archives', JSON.stringify(archives));
+        refreshArchivesUI(); Swal.fire('Sauvegardé', 'Le projet a été ajouté à vos archives.', 'success');
+    }
+
+    function refreshArchivesUI() {
+        const list = $('#archives-list').empty();
+        archives.forEach(a => {
+            list.append(`<div class="archive-card">
+                <span class="text-[10px] font-black uppercase truncate w-32">${a.projectName}</span>
+                <div class="flex gap-2">
+                    <button onclick="loadArchive(${a.id})" class="text-purple-600"><i data-lucide="folder-open" class="w-4"></i></button>
+                    <button onclick="deleteArchive(${a.id})" class="text-red-400"><i data-lucide="trash" class="w-4"></i></button>
+                </div>
+            </div>`);
+        });
+        lucide.createIcons();
+    }
+
+    function loadArchive(id) {
+        const a = archives.find(x => x.id === id);
+        currentData = { ...a.content };
+        $('#project-name').val(a.projectName); // On charge aussi le nom du projet
+        $('#full-name').val(a.content.ui.name); $('#target-job').val(a.content.ui.job);
+        $('#user-email').val(a.content.ui.email); $('#user-phone').val(a.content.ui.phone);
+        $('#user-bio').val(a.content.ui.bio); $('#user-skills').val(a.content.ui.skills);
+        $('#cv-template').val(a.content.ui.tmpl); $('#theme-color').val(a.content.ui.color);
+        renderAll();
+    }
+
+    function deleteArchive(id) { archives = archives.filter(x => x.id !== id); localStorage.setItem('cv_archives', JSON.stringify(archives)); refreshArchivesUI(); }
+
+    function toggleFullView() {
+        if(!$('#full-preview').hasClass('active')) {
+            $('#preview-target').html($('#cv-paper').clone().css({'transform': 'scale(1)', 'margin': '0 auto'}));
+            $('#full-preview').addClass('active');
+        } else { $('#full-preview').removeClass('active'); }
+    }
+
+    function handleExport() {
+        if (!validateForm()) return; // ARRÊT SI INVALIDE
+        const element = document.getElementById('cv-paper');
+        const opt = { margin: 0, filename: `${$('#project-name').val()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    $(document).on('input', 'input, textarea, select', renderCV);
+    $('#photo-file').on('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { currentData.photo = ev.target.result; renderCV(); };
+        reader.readAsDataURL(e.target.files[0]);
     });
-    $('#preview-experience').html(expHTML||'<p>Aucune expérience ajoutée</p>');
-
-    const skills = $('#skill-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
-    $('#preview-skills').html(skills.map(s=>`<li>${s}</li>`).join(''));
-    const langs = $('#lang-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
-    $('#preview-langs').html(langs.map(l=>`<li>${l}</li>`).join(''));
-    const interests = $('#interest-list input').map(function(){ return $(this).val(); }).get().filter(Boolean);
-    $('#preview-interests').html(interests.map(i=>`<li>${i}</li>`).join(''));
-}
-
-// Save CV
-function saveCV(){
-    if(!user){ Swal.fire('⚠️ Connectez-vous pour sauvegarder le CV'); return; }
-    let errorFields = [];
-    $('.required').each(function(){
-        if(!$(this).val().trim()){ errorFields.push($(this).attr('placeholder')); }
-    });
-    if(errorFields.length>0){
-        Swal.fire('⚠️ Veuillez remplir les champs : ' + errorFields.join(', ')); 
-        return; 
-    }
-
-    const cvData = {
-        name: $('#in-name').val(),
-        title: $('#in-title').val(),
-        bio: $('#in-bio').val(),
-        email: $('#in-email').val(),
-        phone: $('#in-phone').val(),
-        location: $('#in-location').val(),
-        linkedin: $('#in-linkedin').val(),
-        photo: photoData,
-        template: $('#template-select').val(),
-        colors: { 
-            header: $('#color-header').val(), 
-            title: $('#color-title').val(), 
-            text: $('#color-text').val() 
-        },
-        experiences: $('#experience-list > div').map(function(){
-            return {
-                company: $(this).find('.in-exp-company').val(),
-                date: $(this).find('.in-exp-date').val(),
-                description: $(this).find('.in-exp-desc').val()
-            };
-        }).get(),
-        skills: $('#skill-list input').map(function(){ return $(this).val(); }).get().filter(Boolean),
-        languages: $('#lang-list input').map(function(){ return $(this).val(); }).get().filter(Boolean),
-        interests: $('#interest-list input').map(function(){ return $(this).val(); }).get().filter(Boolean)
-    };
-
-    let savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
-    savedCVs.push(cvData);
-    localStorage.setItem('savedCVs', JSON.stringify(savedCVs));
-
-    Swal.fire('💾 CV sauvegardé avec succès !');
-    loadSavedCVs();
-}
-
-// Bouton sauvegarder
-$('#save-cv-btn').click(saveCV);
-
-// Export PDF
-$('#export-btn').click(()=>{
-    const opt = {
-        margin: 0.5,
-        filename: 'Mon_CV.pdf',
-        image: {type: 'jpeg', quality: 0.98},
-        html2canvas: {scale: 2, scrollY: 0},
-        jsPDF: {unit: 'in', format: 'a4', orientation: 'portrait'}
-    };
-    html2pdf(document.getElementById('cv-preview-container'), opt);
-});
-
-// Charger CV sauvegardés
-function loadSavedCVs(){
-    const savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
-    const listContainer = $('#saved-cv-list');
-    listContainer.html('');
-    if(savedCVs.length === 0){
-        listContainer.html('<p class="text-gray-500">Aucun CV sauvegardé</p>');
-        return;
-    }
-    savedCVs.forEach((cv,index)=>{
-    const cvItem = $(`
-        <div class="mb-2 p-2 border rounded flex justify-between items-center hover:bg-gray-50">
-            <span>${cv.name} - ${cv.title}</span>
-            <div class="flex gap-2">
-                <button class="text-blue-500 underline text-sm" data-index="${index}">Voir</button>
-                <button class="text-red-500 underline text-sm" data-index="${index}" id="delete-cv">Supprimer</button>
-            </div>
-        </div>
-    `);
-    listContainer.append(cvItem);
-});
-}
-
-// Voir un CV sauvegardé
-$(document).on('click','#saved-cv-list button', function(){
-    const index = $(this).data('index');
-    const savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
-    const cv = savedCVs[index];
-    if(!cv) return;
-    
-    // Supprimer un CV sauvegardé
-$(document).on('click','#saved-cv-list #delete-cv', function(){
-    const index = $(this).data('index');
-    let savedCVs = JSON.parse(localStorage.getItem('savedCVs') || '[]');
-    if(index >= 0 && index < savedCVs.length){
-        savedCVs.splice(index, 1); // Supprime le CV sélectionné
-        localStorage.setItem('savedCVs', JSON.stringify(savedCVs));
-        Swal.fire('✅ CV supprimé avec succès !');
-        loadSavedCVs(); // Recharge la liste
-    }
-});
-
-    // Remplir le formulaire
-    $('#in-name').val(cv.name);
-    $('#in-title').val(cv.title);
-    $('#in-bio').val(cv.bio);
-    $('#in-email').val(cv.email);
-    $('#in-phone').val(cv.phone);
-    $('#in-location').val(cv.location);
-    $('#in-linkedin').val(cv.linkedin);
-    $('#template-select').val(cv.template);
-    $('#color-header').val(cv.colors.header);
-    $('#color-title').val(cv.colors.title);
-    $('#color-text').val(cv.colors.text);
-
-    photoData = cv.photo;
-    if(photoData){
-        $('#preview-photo').html(`<img src="${photoData}" class="w-full h-full object-cover rounded-full">`);
-    } else {
-        $('#preview-photo').html(`<span class="text-slate-400">Photo</span>`);
-    }
-
-    // Expériences
-    $('#experience-list').html('');
-    cv.experiences.forEach(exp=>{
-        $('#experience-list').append(`<div class="mb-2">
-            <input type="text" placeholder="Entreprise" class="cv-input in-exp-company" value="${exp.company}">
-            <input type="text" placeholder="Période" class="cv-input in-exp-date" value="${exp.date}">
-            <textarea placeholder="Description" class="cv-textarea in-exp-desc">${exp.description}</textarea>
-            <span class="remove-btn add-btn mt-1">Supprimer</span>
-        </div>`);
-    });
-
-    // Compétences
-    $('#skill-list').html('');
-    cv.skills.forEach(s => $('#skill-list').append(`<input type="text" placeholder="Compétence" class="cv-input in-skill" value="${s}">`));
-
-    // Langues
-    $('#lang-list').html('');
-    cv.languages.forEach(l => $('#lang-list').append(`<input type="text" placeholder="Langue" class="cv-input in-lang" value="${l}">`));
-
-    // Centres d'intérêt
-    $('#interest-list').html('');
-    cv.interests.forEach(i => $('#interest-list').append(`<input type="text" placeholder="Ex: Football, Lecture..." class="cv-input in-interest" value="${i}">`));
-
-    // Mettre à jour l'aperçu
-    updatePreviewEditor();
-});
-
-// Changement de template
-$('#template-select').on('change', function(){
-    const template = $(this).val();
-    $('#cv-preview-container').removeClass('template-modern template-minimal template-creative');
-    $('#cv-preview-container').addClass(`template-${template}`);
-});
-
-// Mise à jour live
-$('input, textarea, select').on('input change', updatePreviewEditor);
-updatePreviewEditor();
-loadSavedCVs();
 </script>
-
 </body>
 </html>
